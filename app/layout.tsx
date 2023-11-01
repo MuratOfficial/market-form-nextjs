@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 // import {Montserrat as FontSans} from "@fontsource/montserrat-alternates/500.css";
 import Footer from "@/components/footer";
@@ -23,8 +24,9 @@ export default function RootLayout({
         <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow p-12 mx-20 mt-10">
           {children}
         </div>
+        <Toaster />
+        <Footer />
       </body>
-      <Footer />
     </html>
   );
 }
