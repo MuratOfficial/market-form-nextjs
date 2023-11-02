@@ -10,7 +10,7 @@ const DashboardPage = async () => {
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
     id: item.id,
     items: item.items[0],
-    items1: item.items[0],
+    items1: item.items1[0],
     work: item.work,
     hurry: item.hurry,
     username: item.username,
