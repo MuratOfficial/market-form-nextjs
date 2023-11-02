@@ -1,8 +1,14 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import {
+  Link as ScrollLink,
+  Events,
+  scrollSpy,
+  animateScroll as scroll,
+} from "react-scroll";
 import { ToastAction } from "@/components/ui/toast";
 import { toast } from "@/components/ui/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,6 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Link from "next/link";
 
 const formSchema = z.object({
   items: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -58,11 +65,11 @@ function FormBlocks() {
   });
   const router = useRouter();
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     // console.log(data);
     try {
-      // console.log("submitted");
-      // await axios.post(`/api/`, data);
+      console.log("submitted");
+      await axios.post(`/api/`, data);
       toast({
         title: "Опрос завершен",
         description: "Данные приняты, благодарим за ответы!",
@@ -78,9 +85,49 @@ function FormBlocks() {
     }
   };
 
+  useEffect(() => {
+    // Registering the 'begin' event and logging it to the console when triggered.
+    Events.scrollEvent.register("begin", (to, element) => {
+      console.log("begin", to, element);
+    });
+
+    // Registering the 'end' event and logging it to the console when triggered.
+    Events.scrollEvent.register("end", (to, element) => {
+      console.log("end", to, element);
+    });
+
+    // Updating scrollSpy when the component mounts.
+    scrollSpy.update();
+
+    // Returning a cleanup function to remove the registered events when the component unmounts.
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, []);
+
+  const scrollTo = (range: number) => {
+    scroll.scrollMore(range); // Scrolling to 100px from the top of the page.
+  };
+
   const [showItems1, setShowItems1] = useState(false);
   const [showWork, setShowWork] = useState(false);
   const [showForm, setShowForm] = useState(false);
+
+  const scrollDown = (setItem: string) => {
+    if (setItem === "items1") {
+      setShowItems1(true);
+      scrollTo(300);
+    }
+    if (setItem === "work") {
+      setShowWork(true);
+      scrollTo(400);
+    }
+    if (setItem === "form") {
+      setShowForm(true);
+      scrollTo(400);
+    }
+  };
 
   const items = [
     {
@@ -134,7 +181,7 @@ function FormBlocks() {
   ] as const;
 
   return (
-    <div className="h-max w-[760px] flex flex-col p-12 border-2 rounded-lg gap-y-4">
+    <div className="h-max  max-w-[760px] flex flex-col p-12 border-2 rounded-lg gap-y-4">
       {isSubmitted === false ? (
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className=" flex-none">
@@ -145,10 +192,10 @@ function FormBlocks() {
                 render={() => (
                   <FormItem>
                     <div className="mb-4">
-                      <FormLabel className="text-base text-lg">
+                      <FormLabel className="text-base lg:text-lg xs:text-sm">
                         Вид услуги
                       </FormLabel>
-                      <FormDescription className="text-md ">
+                      <FormDescription className=" lg:text-[16px] xs:text-xs">
                         Выберите вид услуги (или виды услуг), которую хотели бы
                         получить
                       </FormDescription>
@@ -181,7 +228,7 @@ function FormBlocks() {
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel className="text-sm font-normal">
+                              <FormLabel className="lg:text-sm xs:text-xs font-normal">
                                 {item.label}
                               </FormLabel>
                             </FormItem>
@@ -193,10 +240,11 @@ function FormBlocks() {
                   </FormItem>
                 )}
               />
+
               <button
-                onClick={() => setShowItems1(true)}
+                onClick={() => scrollDown("items1")}
                 type="button"
-                className="hover:shadow-md transition delay-200 duration-500 ease-linear rounded-lg w-fit py-1 px-3 border-2 hover:border-black text-sm text-neutral-500 hover:text-neutral-900"
+                className="hover:shadow-md lg:text-md xs:text-sm transition delay-200 duration-500 ease-linear rounded-lg w-fit py-1 px-3 border-2 hover:border-black text-sm text-neutral-500 hover:text-neutral-900"
               >
                 Следующее
               </button>
@@ -214,10 +262,10 @@ function FormBlocks() {
                 render={() => (
                   <FormItem>
                     <div className="mb-4">
-                      <FormLabel className="text-base text-lg">
+                      <FormLabel className="text-base lg:text-lg xs:text-sm">
                         Тип сайта
                       </FormLabel>
-                      <FormDescription className="text-md ">
+                      <FormDescription className="lg:text-[16px] xs:text-xs">
                         Выберите тип вашего сайта
                       </FormDescription>
                     </div>
@@ -249,7 +297,7 @@ function FormBlocks() {
                                   }}
                                 />
                               </FormControl>
-                              <FormLabel className="text-sm font-normal">
+                              <FormLabel className="lg:text-sm xs:text-xs font-normal">
                                 {item.label}
                               </FormLabel>
                             </FormItem>
@@ -262,7 +310,7 @@ function FormBlocks() {
                 )}
               />
               <button
-                onClick={() => setShowWork(true)}
+                onClick={() => scrollDown("work")}
                 type="button"
                 className="hover:shadow-md transition delay-200 duration-500 ease-linear rounded-lg w-fit py-1 px-3 border-2 hover:border-black text-sm text-neutral-500 hover:text-neutral-900"
               >
@@ -281,7 +329,7 @@ function FormBlocks() {
                 name="work"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel className="text-lg">
+                    <FormLabel className="lg:text-lg xs:text-sm">
                       Выберите обьем выполняемой работы
                     </FormLabel>
                     <FormControl>
@@ -294,7 +342,7 @@ function FormBlocks() {
                           <FormControl>
                             <RadioGroupItem value="sm" />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
                             Легкий (2-8 раб. часов)
                           </FormLabel>
                         </FormItem>
@@ -302,7 +350,7 @@ function FormBlocks() {
                           <FormControl>
                             <RadioGroupItem value="md" />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
                             Средний (больше 8 раб. часов)
                           </FormLabel>
                         </FormItem>
@@ -310,7 +358,7 @@ function FormBlocks() {
                           <FormControl>
                             <RadioGroupItem value="lg" />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
                             Большой (Сложный)
                           </FormLabel>
                         </FormItem>
@@ -325,7 +373,7 @@ function FormBlocks() {
                 name="hurry"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel className="text-lg">
+                    <FormLabel className="lg:text-lg xs:text-sm">
                       Выберите срочность работы
                     </FormLabel>
                     <FormControl>
@@ -338,7 +386,7 @@ function FormBlocks() {
                           <FormControl>
                             <RadioGroupItem value="nohurry" />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
                             Не срочный
                           </FormLabel>
                         </FormItem>
@@ -346,13 +394,15 @@ function FormBlocks() {
                           <FormControl>
                             <RadioGroupItem value="hurry" />
                           </FormControl>
-                          <FormLabel className="font-normal">Срочный</FormLabel>
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
+                            Срочный
+                          </FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
                             <RadioGroupItem value="maxhurry" />
                           </FormControl>
-                          <FormLabel className="font-normal">
+                          <FormLabel className="font-normal lg:text-sm xs:text-xs">
                             Очень срочный
                           </FormLabel>
                         </FormItem>
@@ -364,7 +414,7 @@ function FormBlocks() {
               />
 
               <button
-                onClick={() => setShowForm(true)}
+                onClick={() => scrollDown("form")}
                 type="button"
                 className="hover:shadow-md transition delay-200 duration-500 ease-linear rounded-lg w-fit py-1 px-3 border-2 hover:border-black text-sm text-neutral-500 hover:text-neutral-900"
               >
@@ -384,7 +434,9 @@ function FormBlocks() {
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">Ваше имя</FormLabel>
+                    <FormLabel className="lg:text-lg xs:text-sm">
+                      Ваше имя
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -397,7 +449,9 @@ function FormBlocks() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">Email</FormLabel>
+                    <FormLabel className="lg:text-lg xs:text-sm">
+                      Email
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="example@gmail.com" {...field} />
                     </FormControl>
@@ -410,7 +464,9 @@ function FormBlocks() {
                 name="tel"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-lg">Телефон</FormLabel>
+                    <FormLabel className="lg:text-lg xs:text-sm">
+                      Телефон
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Телефон" {...field} />
                     </FormControl>
@@ -433,9 +489,13 @@ function FormBlocks() {
         </Form>
       ) : (
         <div className="text-center transition-opacity opacity-100 duration-700 delay-200 ease-in-out">
-          <p>
+          <p className="lg:text-lg xs:text-sm">
             Спасибо за прохождения опроса, мы с вами свяжемся для детального
-            обсуждения вашего заказа! Всего доброго!
+            обсуждения вашего заказа! Всего доброго! Наши работы можете
+            посмотреть на{" "}
+            <span className="font-medium bg-gradient-to-r hover:from-pink-500 hover:to-yellow-500 p-1 rounded-md hover:text-white">
+              <Link href="https://toimet.tech">ToimetTech</Link>
+            </span>
           </p>
         </div>
       )}

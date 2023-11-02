@@ -1,60 +1,52 @@
 import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 
-export async function POST(
-  req: Request,
-  { params }: { params: { storeId: string } }
-) {
+export async function POST(req: Request) {
   try {
     //   const { userId } = auth();
 
     const body = await req.json();
 
-    const { label, imageUrl, description } = body;
+    const { items, items1, work, hurry, username, tel, email } = body;
 
     //   if (!userId) {
     //     return new NextResponse("Unauthenticated", { status: 403 });
     //   }
 
-    if (!label) {
-      return new NextResponse("Label is required", { status: 400 });
+    if (!items) {
+      return new NextResponse("Items is required", { status: 400 });
     }
 
-    if (!description) {
-      return new NextResponse("Description is required", { status: 400 });
+    if (!items1) {
+      return new NextResponse("Items1 is required", { status: 400 });
     }
 
-    if (!imageUrl) {
-      return new NextResponse("Image URL is required", { status: 400 });
+    if (!work) {
+      return new NextResponse("Work is required", { status: 400 });
     }
 
-    if (!params.storeId) {
-      return new NextResponse("Store id is required", { status: 400 });
+    if (!hurry) {
+      return new NextResponse("Hurry is required", { status: 400 });
+    }
+    if (!username) {
+      return new NextResponse("Username is required", { status: 400 });
     }
 
-    const storeByUserId = await prismadb.store.findFirst({
-      where: {
-        id: params.storeId,
-        //   userId,
-      },
-    });
-
-    if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 405 });
-    }
-
-    const billboard = await prismadb.billboard.create({
+    const form = await prismadb.form.create({
       data: {
-        label,
-        imageUrl,
-        description,
-        storeId: params.storeId,
+        items,
+        items1,
+        work,
+        hurry,
+        username,
+        tel,
+        email,
       },
     });
 
-    return NextResponse.json(billboard);
+    return NextResponse.json(form);
   } catch (error) {
-    console.log("[BILLBOARDS_POST]", error);
+    console.log("[FORMS_POST]", error);
     return new NextResponse("Internal error", { status: 500 });
   }
 }

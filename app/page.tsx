@@ -2,10 +2,48 @@
 
 import FormBlocks from "@/components/form-blocks";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Link as ScrollLink,
+  Events,
+  scrollSpy,
+  animateScroll as scroll,
+} from "react-scroll";
 import Link from "next/link";
 
 export default function Home() {
+  useEffect(() => {
+    // Registering the 'begin' event and logging it to the console when triggered.
+    Events.scrollEvent.register("begin", (to, element) => {
+      console.log("begin", to, element);
+    });
+
+    // Registering the 'end' event and logging it to the console when triggered.
+    Events.scrollEvent.register("end", (to, element) => {
+      console.log("end", to, element);
+    });
+
+    // Updating scrollSpy when the component mounts.
+    scrollSpy.update();
+
+    // Returning a cleanup function to remove the registered events when the component unmounts.
+    return () => {
+      Events.scrollEvent.remove("begin");
+      Events.scrollEvent.remove("end");
+    };
+  }, []);
+
+  const scrollTo = (say: string) => {
+    if (say === "yes") {
+      setVariable("yes");
+      scroll.scrollMore(400);
+    }
+    if (say === "no") {
+      setVariable("no");
+      scroll.scrollMore(400);
+    }
+  };
+
   const [variable, setVariable] = useState("");
   const links = [
     { name: "Telegram", href: "https://t.me/Murat_Toimet" },
@@ -18,8 +56,8 @@ export default function Home() {
     { name: "+77752156675", href: "+77752156675" },
   ];
   return (
-    <main className="flex flex-col h-full items-center gap-y-10">
-      <h1 className=" text-4xl font-bold">
+    <main className="flex flex-col h-full items-center  gap-y-10  lg:max-w-full xs:max-w-[320px]">
+      <h1 className=" lg:text-4xl xs:text-lg font-bold text-center ">
         Форма определения желаемого продукта
       </h1>
       <div
@@ -28,22 +66,29 @@ export default function Home() {
         )}
       >
         {" "}
-        <p className="text-neutral-500 text-center px-12">
+        <p className="text-neutral-500 text-center px-12 lg:text-lg  xs:text-sm lg:max-w-full xs:max-w-[300px]">
           Для определения нужного вам конечного продукта и приблизительной
           стоимости, просим пройти небольшой опрос. Либо вы можете напрямую
           позвонить или написать менеджеру по{" "}
-          <span className="text-neutral-800 font-semibold">Whatsapp</span>
+          <Link
+            href="https://wa.me/77472156675"
+            className="text-neutral-800 font-semibold"
+          >
+            Whatsapp
+          </Link>
         </p>
-        <div className="flex flex-row gap-x-16 h--max w-fit">
+        <div className="flex xs:flex-col lg:flex-row lg:gap-x-16 xs:gap-y-4 lg:h-fit xs:h-48 lg:w-fit xs:w-[300px] ">
           <button
-            onClick={() => setVariable("yes")}
-            className="text-neutral-500 h-20  py-6 px-8 border-2 hover:shadow-md rounded-lg hover:border-neutral-800 hover:text-neutral-700 transition delay-200 duration-500 ease-linear"
+            onClick={() => {
+              scrollTo("yes");
+            }}
+            className="text-neutral-500 lg:text-lg xs:text-xs lg:w-fit lg:ml-0 xs:ml-12 xs:w-[200px] py-6 px-8 border-2 hover:shadow-md rounded-lg hover:border-neutral-800 hover:text-neutral-700 transition delay-200 duration-500 ease-linear"
           >
             Да я хочу пройти этот опрос.
           </button>
           <button
-            onClick={() => setVariable("no")}
-            className="text-neutral-500  py-6 px-8 border-2 hover:shadow-md rounded-lg hover:border-neutral-800 hover:text-neutral-700 transition delay-200 duration-500 ease-linear"
+            onClick={() => scrollTo("no")}
+            className="text-neutral-500 lg:text-lg xs:text-xs lg:w-fit xs:w-[200px] lg:ml-0 xs:ml-12  py-6 px-8 border-2 hover:shadow-md rounded-lg hover:border-neutral-800 hover:text-neutral-700 transition delay-200 duration-500 ease-linear"
           >
             Нет, скорее дайте мне номер менеджера!
           </button>

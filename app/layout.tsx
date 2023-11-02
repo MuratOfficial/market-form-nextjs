@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 // import {Montserrat as FontSans} from "@fontsource/montserrat-alternates/500.css";
 import Footer from "@/components/footer";
+import { ClerkProvider } from "@clerk/nextjs";
 
 export const metadata: Metadata = {
   title: "Форма запроса",
@@ -20,13 +21,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow p-12 mx-20 mt-10">
-          {children}
-        </div>
-        <Toaster />
-        <Footer />
-      </body>
+      <ClerkProvider>
+        <body className={inter.className}>
+          <div className="overflow-hidden rounded-[0.5rem] border bg-background shadow p-12 mx-20 mt-10 ">
+            {children}
+          </div>
+          <Toaster />
+          <Footer />
+        </body>
+      </ClerkProvider>
     </html>
   );
 }
