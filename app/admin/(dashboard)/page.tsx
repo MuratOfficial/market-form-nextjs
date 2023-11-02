@@ -6,7 +6,7 @@ import { format } from "date-fns";
 
 const DashboardPage = async () => {
   const forms = await prismadb.form.findMany();
-  const formattedData: Form[] = forms.map((item) => ({
+  const formattedData: Form[] = forms.map((item: any) => ({
     createdAt: format(item.createdAt, "MMMM do, yyyy"),
     id: item.id,
     items: item.items[0],
