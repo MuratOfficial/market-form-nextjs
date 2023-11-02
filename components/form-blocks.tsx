@@ -75,7 +75,6 @@ function FormBlocks() {
         description: "Данные приняты, благодарим за ответы!",
       });
       setIsSubmitted(true);
-      router.refresh();
     } catch (error) {
       toast({
         title: "Что-то пошло не так(...",
